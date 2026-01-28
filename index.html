@@ -1376,6 +1376,14 @@ select:focus, .materials-input:focus {
 
     };
 
+
+    // Detect if the user is on a mobile device
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (isMobile) {
+    // If on mobile, don't even try the iframe, just redirect to the app
+    window.location.href = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+  }
   </script>
 
 </body>
