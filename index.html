@@ -4,2126 +4,1414 @@
   <link rel="icon" type="image/png" href="https://i.ibb.co/ZqC6Lpf/Galaxy-Fiber-Logo-350x100pixels.png">
   <title>FIELD ENGINEER JO WEBAPP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-/* style.css */
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #f4f4f4; font-family: sans-serif; }
+    
+    /* Login Helper Styling */
+    #auth-fallback {
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    .login-button {
+      background-color: #4285F4;
+      color: white;
+      padding: 15px 25px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    iframe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
 
-/* --- 🎨 1. THEME VARIABLES (Centralized Palette) --- */
+    /* ------------------------------------- */
+/* 0. CORE COLOR & FONT VARIABLES - REFINED FOR EXPENSIVE LOOK */
+/* ------------------------------------- */
 :root {
-    /* ====================================================================== */
-    /* CORE BRAND COLORS (From User's New Palette) */
-    /* ====================================================================== */
-    --color-primary: #2d3091;       /* Deep Blue/Purple (Main Tech/Support Brand Color) */
+    /* --- CORE PALETTE: Deep & Rich Tones --- */
+    --color-primary: #1e3a8a;       /* Deep Indigo/Sapphire Blue (Tech/Brand) */
     --color-secondary: #f4821e;     /* Vibrant Orange (Main Accent/Button Color) */
-    --color-background: #fffffe;    /* Almost White (Main Light Background) */
     
-    /* CASHIER/BILLING SPECIFIC COLORS */
-    --color-cashier-main: #ff0000;  /* Bright Red */
-    --color-cashier-accent: #f4821e; /* Orange Accent */
-
-    /* COUNTER BACKGROUNDS */
-    --color-cashier-bg: #ffe0b2;     /* Light Orange/Yellow */
-    --color-support-bg: #e3e4f1;     /* Very Light Blue/Purple (Uses the brand blue tint) */
-    --color-application-bg: #bbdefb; /* Light Blue */
-
-    /* ====================================================================== */
-    /* UTILITY & MAPPING TO OLD ROLES (Adjusted for High Contrast) */
-    /* ====================================================================== */
+    /* --- NEW: High-End Backgrounds --- */
+    --color-background: #f4f6f9;    /* Light Slate/Very Light Gray (Main Background) */
+    --color-background-dark: #1f2937; /* Dark Mode/High Contrast Section Background */
     
-    /* MAPPING OLD CORE VARIABLES TO NEW BRAND COLORS */
-    --color-primary-dark: #1A232F; /* 💥 Topbar/Header/Sidebar uses Dark Charcoal for high contrast 💥 */
-    --color-secondary-blue: var(--color-secondary); /* Maps old Base Button color to new #f4821e (FIXES WHITE BUTTONS) */
-    --color-primary-light: var(--color-background); /* Maps old Main Content BG to new #fffffe */
+    /* --- DERIVED/SUPPORT COLORS --- */
+    --primary-accent: var(--color-primary); 
+    --primary-hover: #1c2e6b;               /* Darker Primary for hover */
     
-    /* Text & Contrast */
-    --color-text-dark: #000000;     /* Black (From user's new list) */
-    --color-text-light: #ffffff;    /* White */
-    --color-text-mid: #333;         /* For form labels, swal text (Kept) */
-
-    /* Sidebar/Menu (Using Dark Charcoal for contrast) */
-    --color-sidebar-bg: var(--color-primary-dark); /* New Dark Charcoal for sidebar */
-    --color-menu-bg: var(--color-text-light); /* White background for menus/cards */
-    --color-submenu-bg: #7a88a2; /* Kept original for contrast unless a new one is specified */
-
-    /* Hover & Transition Colors */
-    --color-hover-dark: #e0761c; /* Darkened shade of secondary orange (#f4821e) for button hover */
-    --color-hover-light: #DDDDDD; /* Light gray for button/row hover (Kept) */
-    --color-submenu-hover: #D2E0FC; /* Light Blue hover (Kept) */
-
-    /* Success & Danger (Kept) */
-    --color-success: #28a745;
-    --color-success-hover: #218838;
-    --color-cancel: #e0e0e0;
-    --color-cancel-text: #333;
-    --color-cancel-hover: #ccc;
-
-    /* Utility, Borders & Shadows */
-    --color-border-default: #ccc;
-    --shadow-medium: 0 8px 15px rgba(45, 48, 145, 0.2); /* Shadow base uses the primary blue */
-    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08); 
-    --shadow-table: 0 2px 10px rgba(0, 0, 0, 0.1);
-    --font-stack: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --action-color: var(--color-secondary);
+    --action-hover: #d16e1a;                /* Darker Secondary for hover */
     
-    /* Specific Utility Colors (Kept) */
-    --color-light-border: #ddd;
-    --color-readonly-bg: #e9ecef;
-
-    /* Filter Button Colors (Explicitly set to new secondary orange) */
-    --color-filter-blue: var(--color-secondary); /* Orange: #f4821e (FIXED BUTTONS) */
-    --color-filter-blue-hover: #e0761c; /* Darkened Orange */
-
-    /* Inventory Specific (Updated header to use the DARK primary for contrast) */
-    --color-inventory-header: var(--color-primary-dark); /* New Dark Charcoal header */
-    --color-inventory-search-border: #d1d5db; 
-    --color-inventory-search-focus: #3b82f6; 
-    --color-inventory-button-dark: #1f2937; 
-    --color-inventory-button-dark-hover: #334155;
-    --color-inventory-stripe: #f9fafb; 
-    --shadow-tailwind-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-tailwind-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-    /* Status & Alerts Colors (Retained) */
-    --color-status-ageing-red: #D32F2F; 
-    --color-status-finished-bg: #d4edda;
-    --color-status-finished-text: #155724;
-    --color-status-dispatch-bg: #fff3cd;
-    --color-status-dispatch-text: #856404;
-    --color-status-pending-red-bg: #f8d7da;
-    --color-status-pending-red-text: #721c24;
+    --card-bg: #ffffff;
+    --text-dark: #111827;                   /* Near-Black (Deeper) for main text */
+    --text-muted: #6b7280;                  /* Medium Gray for secondary text/labels */
+    --border-color: #e5e7eb;                /* Lighter, softer border */
+    --light-gray: #f9fafb;                  /* Off-white for light accents/containers */
+    --medium-gray: #4b5563;                 /* Standard Gray */
+    --border-gray: #d1d5db;
+    --clear-red: #dc2626;                   /* Deep Red */
+    --clear-red-hover: #b91c1c;             /* Darker Deep Red */
     
-    /* New App Status Colors (Retained) */
-    --color-app-status-green-bg: #D4EDDA;
-    --color-app-status-blue-bg: #CCE5FF;
-    --color-app-status-blue-text: #004085;
-    --color-app-status-light-blue-bg: #E0F7FA;
-    --color-app-status-light-blue-text: #006064;
-    --color-app-status-yellow-bg: #FFF3CD;
-    --color-app-status-yellow-text: #856404;
-    --color-app-status-orange-bg: #FFECB3;
-    --color-app-status-orange-text: #FF6F00;
-    --color-app-status-red-bg: #F8D7DA;
-    --color-app-status-red-text: #721C24;
-    --color-app-status-violet-bg: #E6E0F8;
-    --color-app-status-violet-text: #512DA8;
+    /* --- SHADOWS --- */
+    --shadow-subtle: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03); /* Lighter card shadow */
+    --shadow-medium: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); /* Main container shadow */
 
-    /* Inventory Status Colors (Retained) */
-    --color-inv-status-orange-bg: #FFECB3;
-    --color-inv-status-orange-text: #FF6F00;
-    --color-inv-status-yellow-bg: #FFF3CD;
-    --color-inv-status-yellow-text: #856404;
-    --color-inv-status-green-bg: #D4EDDA;
-    --color-inv-status-green-text: #155724;
-
-    /* Performance Monitoring Specific (Retained) */
-    --color-performance-subheader: var(--color-primary-dark); /* New Dark Charcoal */
-    --color-performance-search-focus: #385068;
-    --color-performance-filter-hover: #2e4356;
-    --color-performance-table-accent: var(--color-secondary); /* Use orange accent for table highlights */
-    --color-performance-table-border: #eee;
-    --color-performance-table-row-hover: #f9f9f9;
-    --color-performance-empty-state: #666;
-    --color-performance-job-header-bg: #f3f4f6;
-    --color-performance-job-header-text: #4b5563;
-    --color-performance-job-data-text: #1f2937;
-    --color-performance-job-data-border: #e5e7eb;
-
-    /* Team View Job Status Colors (Retained) */
-    --color-team-finished-bg: #D4EDDA;
-    --color-team-finished-hover: #C3E6CB;
-    --color-team-dispatch-bg: #FFF3CD;
-    --color-team-dispatch-hover: #FFEEC3;
-
-    /* Subscriber Profile Modal Colors (Retained) */
-    --color-profile-label: #555;
-    --color-profile-title-border: #ddd;
-    --font-size-profile-label: 1.5rem;
-    --font-size-profile-value: 1.875rem;
-
-    /* Dashboard Metrics/Summary Colors (Retained) */
-    --color-dashboard-title: var(--color-primary-dark); /* Using dark charcoal for title */
-    --color-dashboard-card-bg: #f4f7f9;
-    --color-dashboard-border-light: #f0f4f8;
-    --color-dashboard-pending-border: #e74c3c;
-    --color-dashboard-dispatched-border: #2ecc71;
-    --color-dashboard-label: #6c757d;
-    --color-dashboard-import-bg: #ecf0f1;
-    --color-dashboard-import-value: #f39c12;
-
-    /* Agent Leads View Colors (Retained) */
-    --color-leads-header: var(--color-primary-dark); /* Using dark charcoal for header */
-    --color-modal-button: #1f3f66;
-    --color-modal-button-hover: #3b5a83;
+    /* --- LAYOUT VARIABLES (UNCHANGED) --- */
+    --sidebar-width: 320px; 
+    --standard-padding: 22px; 
+    --mobile-touch-height: 90px;
 }
 
-/* ------------------------------------------- */
-/* 2. GLOBAL RESET & BASE STYLES */
-/* ------------------------------------------- */
-body, html {
+
+/* ------------------------------------- */
+/* 1. GLOBAL & BODY STYLES - Enhanced Typography */
+/* ------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+    /* Use a slightly bolder weight for overall "heft" */
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    height: 100%;
-    font-family: var(--font-stack);
-    box-sizing: border-box;
+    background-color: var(--color-background); 
+    color: var(--text-dark);
+    min-height: 100vh;
+    transition: margin-left 0.3s ease, background-color 0.3s; /* Transition for smoothness */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    font-size: 20px; 
 }
 
-/* Base button style (for general use outside of the menu) */
-button {
-    padding: 14px 28px;
-    background-color: var(--color-secondary-blue);
-    color: var(--color-text-light);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+h1, h2 {
+    color: var(--text-dark);
+    font-weight: 700; /* Bolder headings */
 }
 
-button:hover {
-    background-color: var(--color-hover-dark);
-}
-
-/* ------------------------------------------- */
-/* 3. DASHBOARD LAYOUT & SIDEBAR STYLES */
-/* ------------------------------------------- */
-.dashboard-container {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.dashboard-topbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--color-primary-dark);
-    color: var(--color-text-light);
-    padding: 20px 30px;
-    z-index: 1000;
-}
-
-.dashboard-user {
-    display: flex;
-    align-items: center;
-}
-
-.user-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 12px;
-}
-
-.user-name {
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.user-position {
-    font-size: 16px;
-}
-
-.dashboard-title {
-    margin: 0;
-    font-size: 26px;
-}
-
-.dashboard-main {
-    display: flex;
-    position: absolute;
-    top: 100px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
-.dashboard-sidebar {
-    width: 280px;
-    background-color: var(--color-sidebar-bg);
-    padding: 25px 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    overflow-y: auto;
-}
-
-.sidebar-menu {
-    list-style: none;
-    padding: 10px;
-    margin: 0;
-}
-
-.sidebar-menu li {
-    margin-bottom: 8px;
-}
-
-.sidebar-menu li:hover {
-    border-radius: 6px;
-}
-
-/* ------------------------------------------- */
-/* 4. MAIN MENU & SUBMENU BUTTONS */
-/* ------------------------------------------- */
-
-.menuBtn {
-    width: 100%;
-    text-align: left;
-    padding: 14px;
-    background-color: var(--color-menu-bg);
-    color: var(--color-text-dark);
-    border: 1px solid var(--color-text-dark);
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.menuBtn:hover {
-    background-color: var(--color-hover-light);
-}
-
-.menuBtn.active {
-    background-color: var(--color-secondary);
-    color: var(--color-text-light);
-    border-color: var(--color-primary-dark);
-}
-
-/* Submenu container style */
-.submenu {
-    list-style: none;
-    padding: 0;
-    margin-top: 5px;
+.app-page {
     display: none;
 }
 
-.submenu li {
-    margin-bottom: 5px;
-}
-
-.submenuBtn {
-    width: 100%;
-    text-align: left;
-    padding: 10px 14px;
-    background-color: var(--color-submenu-bg);
-    color: var(--color-text-dark);
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: normal;
-    cursor: pointer;
-    margin-left: 20px;
-    transition: all 0.3s ease;
-}
-
-.submenuBtn:hover {
-    background-color: var(--color-submenu-hover);
-}
-
-.submenuBtn.active {
-    background-color: var(--color-secondary);
-    color: var(--color-text-light);
-    border-color: var(--color-primary-dark);
-}
-
-/* ------------------------------------------- */
-/* 5. GENERAL INPUT AND LABEL STYLES */
-/* ------------------------------------------- */
-/* NOTE: Input selector generalized for cleanliness */
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
-    padding: 14px 28px;
-    width: 80%;
-    font-size: 16px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    border: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    text-align: center;
-}
-
-label {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* ------------------------------------------- */
-/* 6. LOGIN PAGE STYLES */
-/* ------------------------------------------- */
-#loginPage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-
-#loginForm {
-    background: var(--color-menu-bg);
-    padding: 40px 50px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-medium);
-    width: 400px;
-    text-align: center;
-}
-
-#loginForm h2 {
-    margin-bottom: 30px;
-    color: var(--color-primary-dark);
-    font-size: 24px;
-}
-
-.login-logo {
-    width: 200px;
-    height: 200px;
-    margin-bottom: 30px;
-}
-
-/* ------------------------------------------- */
-/* 7. CONTENT VIEW STYLES */
-/* ------------------------------------------- */
-.dashboard-content {
-    flex-grow: 1;
-    background-color: var(--color-primary-light);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.view-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: var(--color-primary-light);
-    padding-bottom: 10px;
-}
-
-/* ------------------------------------------- */
-/* 8. TABLE STYLES (Complaints, Dispatch, New Apps, Aftersales) */
-/* ------------------------------------------- */
-#complaintsView, #dispatchMasterView, #newApplicationsView, #techTeamView, #aftersalesView {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-#complaintsView h3, #dispatchMasterView h3, #newApplicationsView h3, 
-#newAppFormView h3, #complaintFormView h3, #techTeamView h3, 
-#inventoryControlView h3, #aftersalesView h3 {
-    background: var(--color-primary-dark);
-    z-index: 3;
-    padding: 12px 0;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    color: var(--color-text-light);
-    font-size: 24px;
-    text-indent: 20px;
-}
-
-#inventoryTable, #dispatchTable, #newAppTable, #techTeamTable, #aftersalesTable {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* white */
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow-table);
-}
-
-#inventoryTableWrapper, #dispatchTableWrapper, #newAppTableWrapper, 
-#techTeamTableWrapper, #aftersalesTableWrapper {
-    overflow-y: auto;
-    flex-grow: 1;
-    max-height: 100%;
-}
-
-#inventoryTable thead th, #dispatchTable thead th, #newAppTable thead th, 
-#techTeamTable thead th, #aftersalesTable thead th {
-    position: sticky;
-    background-color: var(--color-primary-dark);
-    color: var(--color-text-light);
-    z-index: 2;
-    top: 0;
-}
-
-#inventoryTable th, #inventoryTable td,
-#dispatchTable th, #dispatchTable td,
-#newAppTable th, #newAppTable td,
-#techTeamTable th, #techTeamTable td,
-#aftersalesTable th, #aftersalesTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd; 
-    font-size: 14px;
-}
-
-#inventoryTable tbody tr:hover,
-#dispatchTable tbody tr:hover,
-#newAppTable tbody tr:hover,
-#techTeamTable tbody tr:hover,
-#aftersalesTable tbody tr:hover {
-    background-color: var(--color-hover-light);
-    transition: background-color 0.2s ease;
-}
-
-/* Optimized border-none rules */
-#inventoryTable th:first-child, #inventoryTable td:first-child,
-#dispatchTable th:first-child, #dispatchTable td:first-child,
-#newAppTable th:first-child, #newAppTable td:first-child,
-#techTeamTable th:first-child, #techTeamTable td:first-child,
-#aftersalesTable th:first-child, #aftersalesTable td:first-child,
-#inventoryTable th:last-child, #inventoryTable td:last-child,
-#dispatchTable th:last-child, #dispatchTable td:last-child,
-#newAppTable th:last-child, #newAppTable td:last-child,
-#techTeamTable th:last-child, #techTeamTable td:last-child,
-#aftersalesTable th:last-child, #aftersalesTable td:last-child {
-    border-left: none;
-    border-right: none;
-}
-
-/* ------------------------------------------- */
-/* 9. SWEETALERT2 MODAL STYLES */
-/* ------------------------------------------- */
-.swal2-popup {
-    font-family: var(--font-stack);
-    border-radius: 14px;
-    padding: 25px 30px;
-    width: 900px !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.swal2-title {
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--color-primary-dark);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.swal2-input, .swal2-select {
-    display: block;
-    margin: 0 auto 15px auto;
-    font-size: 18px !important;
-    padding: 14px 18px !important;
-    width: 85% !important;
-    max-width: 500px;
-    border-radius: 10px !important;
-    border: 1px solid var(--color-border-default) !important;
-    box-sizing: border-box;
-    text-align: center;
-}
-
-.swal2-confirm, .swal2-cancel {
-    font-size: 18px !important;
-    padding: 12px 25px !important;
-    border-radius: 8px !important;
-    margin: 10px 10px 0;
-    min-width: 120px;
-}
-
-.swal2-confirm {
-    background-color: var(--color-secondary-blue) !important;
-    color: var(--color-text-light) !important;
-    border: none !important;
-}
-
-.swal2-confirm:hover {
-    background-color: var(--color-hover-dark) !important;
-}
-
-.swal2-cancel {
-    background-color: var(--color-cancel) !important;
-    color: var(--color-cancel-text) !important;
-    border: none !important;
-}
-
-.swal2-cancel:hover {
-    background-color: var(--color-cancel-hover) !important;
-}
-
-/* ------------------------------------------- */
-/* 10. NEW APPLICATION FORM STYLES */
-/* ------------------------------------------- */
-#newAppFormView {
-    padding: 20px;
-    background-color: var(--color-primary-light);
-    border-radius: 10px;
-    margin: 0;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-#applicationForm {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-section-title {
-    background: var(--color-primary-dark);
-    color: var(--color-text-light);
-    padding: 10px 18px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group label {
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: var(--color-text-mid);
-}
-
-.form-group input[type="text"],
-.form-group input[type="tel"],
-.form-group input[type="email"],
-.form-group select,
-.form-group textarea,
-.form-group input[type="file"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-
-/* Adjust textarea for better multi-line input */
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-/* Style for readonly input */
-.form-group input[readonly] {
-    background-color: #e9ecef; /* Keeping specific readonly color */
-    cursor: not-allowed;
-}
-
-/* Specific button styles for the form */
-.btn-submit {
-    padding: 15px 30px;
-    background-color: var(--color-success);
-    color: var(--color-text-light);
-    border: none;
-    border-radius: 8px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
-    align-self: flex-start;
-}
-
-.btn-submit:hover {
-    background-color: var(--color-success-hover);
-}
-
-/* ------------------------------------------- */
-/* 11. MOBILE RESPONSIVENESS */
-/* ------------------------------------------- */
-@media (max-width: 768px) {
-    .dashboard-topbar {
-        padding: 10px 15px;
-    }
-
-    .dashboard-sidebar {
-        width: 100%;
-        position: static;
-        padding: 10px;
-    }
-
-    .dashboard-main {
-        flex-direction: column;
-        top: 0;
-        left: 0;
-        right: 0;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-}
-/* ------------------------------------------- */
-/* TECH TEAM STYLES */
-/* ------------------------------------------- */
-#techTeamView {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 20px;
-    background-color: var(--color-primary-light); /* #F8F8F8 */
-}
-
-#techTeamView h3 {
-    background: var(--color-primary-dark); /* #1A232F */
-    z-index: 3;
-    padding: 12px 20px;
-    margin: 0;
-    border-radius: 6px;
-    color: var(--color-text-light); /* white */
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-#techTeamTable {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* #fff */
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow-table); /* 0 2px 10px rgba(0, 0, 0, 0.1) */
-}
-
-#techTeamTableWrapper {
-    overflow-y: auto;
-    flex-grow: 1;
-    max-height: 100%;
-}
-
-#techTeamTable thead th {
-    position: sticky;
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    z-index: 2;
-    top: 0;
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 14px;
-}
-
-#techTeamTable th, #techTeamTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-light-border); /* #ddd */
-    font-size: 14px;
-}
-
-#techTeamTable tbody tr:hover {
-    background-color: var(--color-hover-light); /* #DDDDDD */
-    transition: background-color 0.2s ease;
-}
-
-/* Styles for controls */
-.tech-team-header {
-    padding: 0;
-}
-
-.team-controls {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-#teamDropdown {
-    flex: 1;
-    padding: 12px 15px;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-    font-size: 16px;
-    background-color: var(--color-menu-bg); /* white */
-    cursor: pointer;
-}
-
-#techTeamCheckBtn {
-    padding: 12px 25px;
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#techTeamCheckBtn:hover {
-    background-color: #333d4e; /* Keeping this specific shade */
-}
-
-#techTeamSearchInput {
-    flex: 1;
-    padding: 12px 15px;
-    font-size: 16px;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-}
-
-#techTeamFilterBtn {
-    padding: 12px 25px;
-    background-color: var(--color-filter-blue); /* #4b8ae0 */
-    color: var(--color-text-light); /* white */
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#techTeamFilterBtn:hover {
-    background-color: var(--color-filter-blue-hover); /* #3974c0 */
-}
-
-/* ------------------------------------------- */
-/* INVENTORY CONTROL VIEW STYLES */
-/* ------------------------------------------- */
-#inventoryControlView {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#inventoryControlView .bg-white {
-    background-color: var(--color-menu-bg); /* #ffffff */
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow-tailwind-md);
-    padding: 1.5rem;
-}
-
-#inventoryControlView .inventory-header h3 {
-    /* This rule is redundant with one in Chunk 1, but preserved for now. */
-    background: var(--color-primary-dark); /* #1A232F */
-    z-index: 3;
-    padding: 12px 0;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-    color: var(--color-text-light); /* white */
-    font-size: 24px;
-    text-indent: 20px;
-}
-
-#inventoryControlView .inventory-header .flex {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    margin-bottom: 1rem;
-}
-
-@media (min-width: 640px) {
-    #inventoryControlView .inventory-header .flex {
-        flex-direction: row;
-    }
-}
-
-#inventorySearchInput {
-    flex-grow: 1;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-inventory-search-border); /* #d1d5db */
-    transition: all 0.2s ease;
-}
-
-#inventorySearchInput:focus {
-    outline: 2px solid var(--color-inventory-search-focus); /* #3b82f6 */
-    outline-offset: 2px;
-    box-shadow: 0 0 0 2px var(--color-inventory-search-focus);
-}
-
-#inventoryFilterBtn {
-    background-color: var(--color-inventory-button-dark); /* #1f2937 */
-    color: var(--color-text-light); /* #ffffff */
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-
-#inventoryFilterBtn:hover {
-    background-color: var(--color-inventory-button-dark-hover); /* #334155 */
-}
-
-#inventoryTableWrapper {
-    margin-top: 2rem;
-    overflow-x: auto;
-}
-
-#inventoryTable {
-    min-width: 100%;
-    border-collapse: collapse;
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow-tailwind-sm); /* 0 1px 2px 0 rgba(0, 0, 0, 0.05) */
-    overflow: hidden;
-}
-
-#inventoryTable thead {
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-}
-
-#inventoryTable thead th {
-    position: sticky;
-    top: 0;
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 14px;
-    font-weight: bold;
-    z-index: 2;
-}
-
-#inventoryTable tbody tr:nth-child(even) {
-    background-color: var(--color-inventory-stripe); /* #f9fafb */
-}
-
-#inventoryTable tbody tr:hover {
-    background-color: var(--color-hover-light); /* #DDDDDD */
-    transition: background-color 0.2s ease;
-}
-
-#inventoryTable td {
-    padding: 12px 15px;
-    white-space: nowrap;
-    font-size: 14px;
-    border-bottom: 1px solid var(--color-light-border); /* #ddd */
-}/* ------------------------------------------- */
-/* CUSTOM CHECKBOX DROPDOWN STYLES */
-/* ------------------------------------------- */
-.checkbox-dropdown {
-    position: relative;
-    width: 100%;
-}
-.checkbox-dropdown .selected-items {
-    width: 100%;
-    padding: 12px;
-    margin-top: 6px;
-    margin-bottom: 16px;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 18px;
-    background-color: var(--color-menu-bg); /* white */
-    cursor: pointer;
-    text-transform: uppercase;
-}
-.checkbox-dropdown .items {
-    display: none;
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    background-color: var(--color-menu-bg); /* #fff */
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* FIX: Ensure the label and checkbox are on the same line */
-.checkbox-dropdown .items label {
-    align-items: center;
-    padding: 8px 12px;
-    font-weight: normal;
-    font-size: 16px;
-    text-transform: uppercase;
-    color: var(--color-text-mid); /* added for consistency */
-}
-
-.checkbox-dropdown .items label:hover {
-    background-color: #f1f1f1; /* Keeping specific light gray */
-}
-
-/* FIX: Make sure the checkbox inputs don't take up full width */
-.checkbox-dropdown .items input[type="checkbox"] {
-    margin-right: 10px;
-    padding: 0;
-    width: auto;
-    vertical-align: middle;
-}
-.checkbox-dropdown .items.show {
+.app-page.active {
     display: block;
 }
 
-/* ------------------------------------------- */
-/* SEARCH RESULTS DROPDOWN STYLES */
-/* ------------------------------------------- */
-.search-container {
-    position: relative;
-    display: inline-block;
+/* Save Status - Subtle Shadow */
+#saveStatus {
+    font-size: 24px; 
+    margin-top: -18px;
+    margin-bottom: 30px; 
+    font-weight: 700; /* Bolder */
+    color: var(--primary-accent);
+    text-align: center;
+    /* Subtle text shadow for pop */
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-/* Styling for the dropdown container */
-.search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: var(--color-menu-bg); /* #fff */
-    border: 1px solid #e0e0e0; /* Keeping specific light gray */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    z-index: 10;
-    max-height: 250px;
-    overflow-y: auto;
-    margin-top: 4px;
-    font-size: 20px;
-}
-
-/* Styling for each result link */
-.search-results a {
-    display: block;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: #333; /* Keeping specific dark text */
-    border-bottom: 1px solid #f0f0f0; /* Keeping specific very light gray */
-    transition: background-color 0.2s ease-in-out;
-}
-
-/* Remove border from the last item */
-.search-results a:last-child {
-    border-bottom: none;
-}
-
-/* Hover state for a professional feel */
-.search-results a:hover {
-    background-color: #f5f5f5; /* Keeping specific hover gray */
-    color: #000; /* Keeping specific black text */
-}
-
-/* Styling for the "No matches found" message */
-.search-results a[href="#"] {
-    font-style: italic;
-    color: #777; /* Keeping specific gray text */
-    cursor: default;
-}
-
-.search-results a[href="#"]:hover {
-    background-color: transparent;
-}
-/* ------------------------------------------- */
-/* SERVED TICKETS VIEW STYLES */
-/* ------------------------------------------- */
-
-/* Apply display flex and padding to the main view container */
-#servedTicketsView {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 20px;
-    background-color: var(--color-primary-light); /* #F8F8F8 */
-}
-
-/* Style the header section */
-.servedTickets-header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-/* Style the main "Served Tickets" heading */
-.servedTickets-header h3 {
-    background: var(--color-inventory-header); /* #4CAF50 */
-    color: var(--color-text-light); /* white */
-    padding: 12px 20px;
-    margin: 0;
-    border-radius: 6px;
-    font-size: 24px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Style the search input field */
-#servedTicketsSearchInput {
-    flex-grow: 1;
-    width: 100%;
-    padding: 12px 15px;
-    font-size: 16px;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-/* Style the filter button */
-#servedTicketsFilterBtn {
-    padding: 12px 25px;
-    background-color: var(--color-filter-blue); /* #4b8ae0 */
-    color: var(--color-text-light); /* white */
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#servedTicketsFilterBtn:hover {
-    background-color: var(--color-filter-blue-hover); /* #3974c0 */
-}
-
-/* Container for the table */
-#servedTicketsWrapper {
-    overflow-y: auto;
-    flex-grow: 1;
-    max-height: 100%;
-}
-
-/* Table styling (mostly inherited from your existing table styles) */
-#servedTicketsTable {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* #fff */
+.message-box {
+    margin-top: 25px; 
+    padding: 20px; 
     border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow-table); /* 0 2px 10px rgba(0, 0, 0, 0.1) */
-}
-
-#servedTicketsTable thead th {
-    position: sticky;
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    z-index: 2;
-    top: 0;
-}
-
-#servedTicketsTable th, #servedTicketsTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-light-border); /* #ddd */
-    font-size: 14px;
-}
-
-#servedTicketsTable tbody tr:hover {
-    background-color: var(--color-hover-light); /* #DDDDDD */
-    transition: background-color 0.2s ease;
-}
-
-/* Adjust for mobile view */
-@media (min-width: 640px) {
-    .servedTickets-header {
-        flex-direction: row;
-    }
-    #servedTicketsSearchInput {
-        width: auto;
-    }
-}
-
-/* ------------------------------------------- */
-/* AGEING TICKETS VIEW STYLES */
-/* ------------------------------------------- */
-
-/* Apply display flex and padding to the main view container */
-#ageingTicketsView {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 20px;
-    background-color: var(--color-primary-light); /* #F8F8F8 */
-}
-
-/* Style the header section */
-.ageingTickets-header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-/* Style the main "Ageing Tickets" heading */
-.ageingTickets-header h3 {
-    background: var(--color-status-ageing-red); /* #D32F2F */
-    color: var(--color-text-light); /* white */
-    padding: 12px 20px;
-    margin: 0;
-    border-radius: 6px;
-    font-size: 24px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Style the search input field */
-#ageingTicketsSearchInput {
-    flex-grow: 1;
-    width: 100%;
-    padding: 12px 15px;
-    font-size: 16px;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-/* Style the filter button */
-#ageingTicketsFilterBtn {
-    padding: 12px 25px;
-    background-color: var(--color-filter-blue); /* #4b8ae0 */
-    color: var(--color-text-light); /* white */
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#ageingTicketsFilterBtn:hover {
-    background-color: var(--color-filter-blue-hover); /* #3974c0 */
-}
-
-/* Container for the table */
-#ageingTicketsWrapper {
-    overflow-y: auto;
-    flex-grow: 1;
-    max-height: 100%;
-}
-
-/* Table styling (mostly inherited from your existing table styles) */
-#ageingTicketsTable {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* #fff */
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow-table); /* 0 2px 10px rgba(0, 0, 0, 0.1) */
-}
-
-#ageingTicketsTable thead th {
-    position: sticky;
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    z-index: 2;
-    top: 0;
-}
-
-#ageingTicketsTable th, #ageingTicketsTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-light-border); /* #ddd */
-    font-size: 14px;
-}
-
-#ageingTicketsTable tbody tr:hover {
-    background-color: var(--color-hover-light); /* #DDDDDD */
-    transition: background-color 0.2s ease;
-}
-
-/* Adjust for mobile view */
-@media (min-width: 640px) {
-    .ageingTickets-header {
-        flex-direction: row;
-    }
-    #ageingTicketsSearchInput {
-        width: auto;
-    }
-}
-/* ------------------------------------------- */
-/* PERFORMANCE MONITORING*/
-/* ------------------------------------------- */
-
-/* Main view container */
-#performanceMonitorView {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 30px; 
-    background-color: var(--color-primary-light); /* #f8f8f8 */
-    gap: 25px;
-}
-
-/* Common container for each data block (e.g., Accomplishments, Pending Tickets) */
-.data-section-card {
-    background-color: var(--color-menu-bg); /* #ffffff */
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-}
-
-/* Sub-header for grouping (like 'PENDING JOBS OVER TIME') */
-.subheader-style {
-    font-size: 18px;
-    font-weight: bold;
-    color: var(--color-performance-subheader); /* #333 */
-    margin: 15px 0 5px 0;
-    padding: 0 10px;
-    text-transform: uppercase;
-}
-
-/* ------------------------------------------- */
-/* HEADER & INTERACTION STYLES */
-/* ------------------------------------------- */
-
-/* Style the top header section (search and filter) */
-.performance-header {
-    display: flex;
-    flex-direction: column; 
-    gap: 0; 
-    margin-bottom: 0;
-}
-
-/* Apply the dark, solid bar style to ALL headings (H2) */
-.performance-header h2 {
-    background: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    padding: 15px 20px;
-    margin: 0;
-    border-radius: 0; 
-    font-size: 20px;
+    font-size: 24px; 
     font-weight: 600;
-    width: 100%;
+    text-align: center;
+    /* Added subtle shadow to the message box */
+    box-shadow: var(--shadow-subtle);
+}
+
+/* ------------------------------------- */
+/* 2. LAYOUT: CONTAINER, HEADER & SEARCH - High-End Card Look */
+/* ------------------------------------- */
+
+/* Desktop Container (Main Content Wrapper) */
+.container {
+    max-width: 1300px; /* Slightly wider */
+    margin: 60px auto; /* More margin top/bottom for breathing room */
+    padding: 50px; /* More internal padding */
+    background: var(--card-bg);
+    border-radius: 20px; /* Softer rounded corners */
+    /* Use the medium shadow variable */
+    box-shadow: var(--shadow-medium); 
+    border: 1px solid var(--border-color);
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 60px; /* More spacing */
+}
+
+.logo-container img {
+    /* --- LOGO SIZE INCREASED --- */
+    max-width: 900px; 
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Elevated shadow */
+}
+
+/* Search Group */
+.search-container {
+    text-align: center;
+    margin-bottom: 50px; 
+    gap: 25px; /* More space between input and button */
+    justify-content: center;
+    align-items: center;
+}
+
+.search-input {
+    width: calc(100% - 180px); 
+    max-width: 800px; /* Wider input */
+    padding: 22px; 
+    font-size: 28px; /* Slightly larger text */
+    border: 1px solid var(--border-gray); /* Thinner initial border */
+    border-radius: 12px; /* Softer radius */
     box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
-
-/* Controls wrapper (for search and filter) */
-.performance-controls {
-    display: flex;
-    flex-direction: column; 
-    padding: 15px 20px;
-    gap: 10px;
-    background-color: var(--color-menu-bg); /* #fff */
-}
-
-/* Style the search input field - WIDE AS REQUESTED */
-#performanceSearchInput {
-    flex-grow: 1;
-    width: 100%;
-    padding: 10px 15px; 
-    font-size: 14px; 
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 4px;
-    box-sizing: border-box;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: border-color 0.2s;
-}
-
-#performanceSearchInput:focus {
-    border-color: var(--color-performance-search-focus); /* #385068 */
+.search-input:focus {
+    border-color: var(--primary-accent);
+    /* Refined focus ring */
+    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.2); 
     outline: none;
 }
 
-/* Style the filter button (Dark/Primary Button) */
-#performanceMonitorFilterBtn {
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    align-self: center;
-    flex-shrink: 0;
-    font-size: 14px;
-    margin-bottom: 15px;
-    /* NOTE: Missing original button background/color/padding styles. Assuming they are inherited 
-             or should be defined here for consistency with other buttons: */
-    padding: 12px 25px; /* Added for consistency with other buttons */
-    background-color: var(--color-filter-blue);
-    color: var(--color-text-light);
-    border-radius: 6px;
-    font-weight: bold;
-}
-
-#performanceMonitorFilterBtn:hover {
-    background-color: var(--color-performance-filter-hover); /* #2e4356 */
-}
-
-
-/* ------------------------------------------- */
-/* COMMON TABLE STYLING */
-/* ------------------------------------------- */
-
-.table-container {
-    overflow-x: auto;
-    padding: 0 20px 20px 20px;
-}
-
-.min-w-full {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* #fff */
-    border-radius: 0;
-}
-
-/* Apply STICKY HEADER styles to ALL tables' column headers */
-.min-w-full thead th {
-    position: sticky;
-    z-index: 10;
-    top: 0;
-    padding: 12px 15px;
-    text-align: left;
-    background-color: var(--color-primary-dark) !important; /* #1A232F */
-    color: var(--color-text-light); /* white */
-    font-size: 13px; 
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-/* Special styling for the 'TOTAL' column header on the ACCOMPLISHMENTS table */
-#performanceTable .total-column-header {
-    background-color: var(--color-performance-table-accent) !important; /* #2563EB */
-}
-
-/* Common padding, font, and border for all cells in all tables */
-.min-w-full th, .min-w-full td {
-    padding: 10px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-performance-table-border); /* #eee */
-    font-size: 14px;
-}
-
-/* Common row hover effect */
-.min-w-full tbody tr:hover {
-    background-color: var(--color-performance-table-row-hover); /* #f9f9f9 */
-    transition: background-color 0.2s ease;
-}
-
-/* Empty state message style */
-.empty-state {
-    text-align: center !important;
-    font-style: italic;
-    color: var(--color-performance-empty-state); /* #666 */
-    padding: 20px !important;
-}
-
-/* ------------------------------------------- */
-/* DATA SECTION HEADER STYLE (for cards) */
-/* ------------------------------------------- */
-
-/* Use this for the main title bar of ANY data card (like PENDING JOBS) */
-.data-section-card .data-section-header {
-    background: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    padding: 15px 20px;
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* ====================================================================== */
-/* JOB DETAILS MODAL STYLING (Redesigned for better readability) */
-/* ====================================================================== */
-
-/* Container ensures vertical scroll inside the wide modal */
-.job-details-container {
-    max-height: 75vh;
-    overflow-y: auto;
-}
-
-/* Base table style for wide view */
-.job-details-table {
-    min-width: 1900px;
-    table-layout: fixed;
-    border-collapse: collapse; 
-}
-
-/* Cell and Header Styling for consistent look */
-.job-details-table th, 
-.job-details-table td {
-    padding: 10px 14px;
-    border-right: 1px solid var(--color-performance-job-data-border); /* #e5e7eb */
-    text-align: left;
-    vertical-align: top;
-}
-
-/* Sticky Header Styling (Crucial for a presentable long table) */
-.job-details-table th {
-    background-color: var(--color-performance-job-header-bg); /* #f3f4f6 */
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--color-performance-job-header-text); /* #4b5563 */
-    position: sticky;
-    top: 0;
-    z-index: 20; 
-    box-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.15);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Data Cell Styling for readability and wrapping */
-.job-details-table td {
-    font-size: 0.875rem;
-    color: var(--color-performance-job-data-text); /* #1f2937 */
-    border-bottom: 1px solid var(--color-performance-job-data-border); /* #e5e7eb */
-    word-wrap: break-word;
-}
-
-/* --- Column Text Wrapping and Width Control (Preserved) --- */
-
-/* Default for most columns: Prevent wrapping and truncate for compactness */
-.job-details-table td {
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Override: Allow text wrapping for key descriptive fields */
-.job-details-table .col-remarks td,
-.job-details-table .col-name td,
-.job-details-table .col-address td,
-.job-details-table .col-instruction td {
-    white-space: normal !important;
-    overflow: visible;
-}
-
-
-/* Custom Column Widths - Adjusted for better balance and readability (Preserved) */
-.job-details-table .col-date { width: 100px; }
-.job-details-table .col-remarks { width: 300px; }
-.job-details-table .col-name { width: 180px; }
-.job-details-table .col-ticket { width: 130px; }
-.job-details-table .col-address { width: 380px; }
-.job-details-table .col-plan { width: 150px; }
-.job-details-table .col-account { width: 120px; }
-.job-details-table .col-modem { width: 120px; }
-.job-details-table .col-balance { width: 90px; }
-.job-details-table .col-instruction { width: 200px; }
-
-/* SweetAlert Global Override */
-.swal2-popup {
-    max-width: 98vw !important; 
-}
-
-/* --- Dispatch Table Color Coding --- */
-
-/* FINISHED - Green */
-.status-finished {
-    background-color: var(--color-status-finished-bg) !important;
-    color: var(--color-status-finished-text); 
-}
-
-/* DISPATCH - Yellow/Orange */
-.status-dispatch {
-    background-color: var(--color-status-dispatch-bg) !important;
-    color: var(--color-status-dispatch-text);
-}
-
-/* PENDING RED - Red */
-.status-pending-red {
-    background-color: var(--color-status-pending-red-bg) !important;
-    color: var(--color-status-pending-red-text);
-    font-weight: bold;
-}
-
-/* Ensure buttons in colored rows look fine */
-.status-finished button,
-.status-dispatch button,
-.status-pending-red button {
-    border: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-/* Optional: Add hover effect */
-#dispatchTable tbody tr:hover {
-    background-color: #f5f5f5 !important;
-    cursor: pointer;
-}
-.status-finished:hover { background-color: #c3e6cb !important; } /* Keeping specific hover shades */
-.status-dispatch:hover { background-color: #ffeeba !important; }
-.status-pending-red:hover { background-color: #f5c6cb !important; }
-
-
-/* --- New Applications Table Color Coding --- */
-
-/* GREEN: COMPLETE + TRANSFERRED */
-.app-status-green {
-    background-color: var(--color-app-status-green-bg) !important;
-    color: var(--color-app-status-green-text);
-}
-
-/* BLUE: COMPLETE + PENDING */
-.app-status-blue {
-    background-color: var(--color-app-status-blue-bg) !important;
-    color: var(--color-app-status-blue-text);
-}
-
-/* LIGHT BLUE: CREATED + PENDING */
-.app-status-light-blue {
-    background-color: var(--color-app-status-light-blue-bg) !important;
-    color: var(--color-app-status-light-blue-text);
-}
-
-/* YELLOW: FOR VALIDATION + PENDING */
-.app-status-yellow {
-    background-color: var(--color-app-status-yellow-bg) !important;
-    color: var(--color-app-status-yellow-text);
-}
-
-/* ORANGE: FOR COMPLIANCE + PENDING */
-.app-status-orange {
-    background-color: var(--color-app-status-orange-bg) !important;
-    color: var(--color-app-status-orange-text);
-}
-
-/* RED: CANCELLED + PENDING */
-.app-status-red {
-    background-color: var(--color-app-status-red-bg) !important;
-    color: var(--color-app-status-red-text);
-    font-weight: bold;
-}
-
-/* VIOLET: HOLD + PENDING */
-.app-status-violet {
-    background-color: var(--color-app-status-violet-bg) !important;
-    color: var(--color-app-status-violet-text);
-    font-weight: bold;
-}
-
-/* --- Inventory Status Color Coding --- */
-
-/* ORANGE: PENDING (New, more vibrant orange) */
-.inv-status-orange {
-    background-color: var(--color-inv-status-orange-bg) !important;
-    color: var(--color-inv-status-orange-text);
-    font-weight: bold;
-}
-
-/* YELLOW: FOR TRANSFER (New, more vibrant yellow) */
-.inv-status-yellow {
-    background-color: var(--color-inv-status-yellow-bg) !important;
-    color: var(--color-inv-status-yellow-text);
-}
-
-/* GREEN: TRANSFERRED (Remains the same) */
-.inv-status-green {
-    background-color: var(--color-inv-status-green-bg) !important;
-    color: var(--color-inv-status-green-text);
-}
-
-/* Optional: Add hover effect for inventory table rows */
-#inventoryTable tbody tr:hover {
-    filter: brightness(95%);
-    cursor: pointer;
-}
-
-/* ------------------------------------------- */
-/* SUBSCRIBER MASTER VIEW CUSTOM STYLES */
-/* ------------------------------------------- */
-
-/* Main View Container */
-#subscriberMasterView {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header Styling (Applied to the H3) */
-#subscriberMasterView h3 {
-    background: var(--color-primary-dark); /* #1A232F */
-    z-index: 3;
-    padding: 12px 0;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-    color: var(--color-text-light); /* white */
-    font-size: 24px;
-    text-indent: 20px;
-}
-
-/* Table Wrapper (Allows Scrolling) */
-.table-wrapper {
-    overflow-y: auto;
-    flex-grow: 1; 
-    max-height: 70vh;
-}
-
-/* Table Base Styles */
-#subscriberMasterTable {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* #fff */
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: var(--shadow-table); /* 0 2px 10px rgba(0, 0, 0, 0.1) */
-}
-
-/* Sticky Header */
-#subscriberMasterTable thead th {
-    position: sticky;
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    z-index: 2;
-    top: 0;
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 14px;
-}
-
-/* Cell Styling */
-#subscriberMasterTable th, #subscriberMasterTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-light-border); /* #ddd */
-    font-size: 14px;
-}
-
-/* Hover Effect */
-#subscriberMasterTable tbody tr:hover {
-    background-color: var(--color-hover-light); /* #DDDDDD */
-    transition: background-color 0.2s ease;
-}
-
-/* Remove side borders on first/last column */
-#subscriberMasterTable th:first-child, #subscriberMasterTable td:first-child {
-    border-left: none;
-}
-#subscriberMasterTable th:last-child, #subscriberMasterTable td:last-child {
-    border-right: none;
-}
-
-/* ------------------------------------------- */
-/* PAGINATION FIXES (Explicit CSS for Layout) */
-/* ------------------------------------------- */
-
-/* Force Flexbox layout and centering to fix stacking issue */
-#paginationControls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1.5rem;
-    gap: 0.25rem;
-}
-
-/* Explicit Button Sizing and Styling */
-.pagination-btn {
-    padding: 8px 16px;
-    border-radius: 8px; 
-    transition: background-color 0.2s;
-    font-size: 0.875rem;
-    font-weight: 500; 
-    cursor: pointer;
-}
-
-/* ------------------------------------------- */
-/* SUBSCRIBER PROFILE MODAL STYLING (BIGGER & MORE READABLE) */
-/* ------------------------------------------- */
-
-/* Custom Class for the large, detailed profile modal */
-.subscriber-profile-swal {
-    max-width: 1400px !important;
-    width: 95% !important; 
-}
-
-.swal2-title {
-    color: var(--color-primary-dark) !important; /* #1A232F */
-    font-size: 2rem !important;
-    font-weight: 700 !important;
-    border-bottom: 2px solid var(--color-profile-title-border); /* #ddd */
-    padding-bottom: 10px;
-    margin-bottom: 1.5rem !important; 
-}
-.swal2-html-container {
-    margin: 0 !important;
-    padding: 0 10px 20px 10px; 
-}
-.detail-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 20px;
-    text-align: left;
-    padding: 0 10px;
-}
-@media (min-width: 768px) {
-    .detail-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    word-break: break-word; 
-}
-.detail-label {
-    font-weight: 600;
-    color: var(--color-profile-label); /* #555 */
-    text-transform: uppercase;
-    font-size: var(--font-size-profile-label); /* 1.5rem */
-}
-.detail-value {
-    font-weight: 700;
-    color: var(--color-primary-dark); /* #1A232F */
-    font-size: var(--font-size-profile-value); /* 1.875rem */
-}
-
-/* ------------------------------------------- */
-/* TEAM VIEW FOR MONITORING ROW COLORING */
-/* ------------------------------------------- */
-
-/* FINISHED JOB ROW COLORING (Green) */
-.finished-job {
-    background-color: var(--color-team-finished-bg) !important; /* #D4EDDA */
-    transition: background-color 0.3s ease;
-}
-.finished-job:hover {
-    background-color: var(--color-team-finished-hover) !important; /* #C3E6CB */
-}
-
-/* DISPATCH JOB ROW COLORING (Yellow/Amber) */
-.dispatch-job {
-    background-color: var(--color-team-dispatch-bg) !important; /* #FFF3CD */
-    transition: background-color 0.3s ease;
-}
-.dispatch-job:hover {
-    background-color: var(--color-team-dispatch-hover) !important; /* #FFEEC3 */
-}
-
-/* ------------------------------------------- */
-/* BASE MODAL STYLES (for smaller, non-Swal modals) */
-/* ------------------------------------------- */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 9999; 
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.7); 
-}
-
-.modal-content {
-    background-color: var(--color-menu-bg); /* #fefefe */
-    margin: 15% auto;
-    padding: 30px;
-    border: 1px solid #888; /* Keeping specific gray border */
-    width: 80%; 
-    max-width: 750px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    position: relative;
-    font-family: var(--font-primary);
-}
-
-.close-button {
-    color: #aaa; /* Keeping specific light gray */
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    line-height: 20px;
-    cursor: pointer;
-}
-.close-button:hover, .close-button:focus {
-    color: #000; /* Keeping specific black */
-    text-decoration: none;
-}
-
-.modal-button {
-    background-color: var(--color-modal-button); /* #1f3f66 */
-    color: var(--color-text-light); /* white */
-    padding: 10px 20px;
+.search-button {
+    padding: 22px 40px; 
+    font-size: 28px; 
+    background-color: var(--primary-accent);
+    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
     cursor: pointer;
-    margin-top: 20px;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-.modal-button:hover {
-    background-color: var(--color-modal-button-hover); /* #3b5a83 */
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s; 
+    font-weight: 600; /* Bolder button text */
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3); /* Accent shadow */
 }
 
-/* ------------------------------------------- */
-/* DASHBOARD SPECIFIC STYLES */
-/* ------------------------------------------- */
-.status-section {
-    margin-bottom: 20px;
-    padding: 10px 0;
+.search-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px); /* Higher lift on hover */
+    box-shadow: 0 6px 15px rgba(30, 58, 138, 0.4);
 }
 
-.section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--color-dashboard-title); /* #1f3f66 */
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--color-dashboard-border-light); /* #f0f4f8 */
-    padding-bottom: 5px;
+/* ------------------------------------- */
+/* 3. SIDEBAR AND NAVIGATION STYLES - Dark, High-Contrast Sidebar */
+/* ------------------------------------- */
+
+.menu-toggle {
+    top: 30px; 
+    left: 30px; 
+    z-index: 1001;
+    background-color: var(--primary-accent);
+    color: white;
+    border: none;
+    padding: 20px 28px; 
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 30px; 
+    /* Deeper shadow */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); 
+    transition: left 0.3s ease, background-color 0.2s, transform 0.1s;
+}
+.menu-toggle:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
-/* Grid for the 4 summary cards */
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    /* Use the dark background variable for luxury contrast */
+    background-color: var(--color-background-dark); 
+    overflow-x: hidden;
+    transition: 0.3s;
+    padding-top: 100px; /* More padding top */
+    /* Deeper shadow */
+    box-shadow: 8px 0 25px rgba(0, 0, 0, 0.5); 
+}
+
+.sidebar.open {
+    width: var(--sidebar-width);
+}
+
+.sidebar-header {
+    padding: 30px; 
+    color: #ffffff; /* Pure white text for max contrast */
     text-align: center;
+    /* Elegant line separator */
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1); 
+    margin-bottom: 25px; 
+    font-size: 30px; 
+    font-weight: 700;
 }
 
-.summary-card {
-    background-color: var(--color-dashboard-card-bg); /* #f4f7f9 */
-    padding: 15px 10px;
-    border-radius: 8px;
-    border-left: 5px solid;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.pending-card { border-color: var(--color-dashboard-pending-border); } /* #e74c3c */
-.dispatched-card { border-color: var(--color-dashboard-dispatched-border); } /* #2ecc71 */
-
-.metric-label {
-    font-size: 12px;
-    color: var(--color-dashboard-label); /* #6c757d */
-    margin: 0 0 5px 0;
-    text-transform: uppercase;
-}
-
-.metric-value {
-    font-size: 36px;
-    font-weight: bold;
-    margin: 0;
-    color: var(--color-dashboard-title); /* #1f3f66 */
-}
-
-/* Styles for Import and Ageing Sections */
-.import-section {
-    background-color: var(--color-dashboard-import-bg); /* #ecf0f1 */
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.import-value {
-    font-size: 48px;
-    color: var(--color-dashboard-import-value); /* #f39c12 */
-}
-
-.ageing-list {
+.menu-items {
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+.menu-item a {
+    padding: 22px 35px; /* More padding */
+    font-size: 26px; 
+    color: #e5e7eb; /* Soft white text */
+    display: block;
+    transition: background-color 0.2s, transform 0.1s, color 0.2s;
+    /* Sharper/modern radius */
+    border-radius: 0 8px 8px 0;
+    margin-right: 20px;
+}
+
+.menu-item a:hover {
+    background-color: var(--primary-hover);
+    transform: translateX(8px); /* More pronounced slide effect */
+    color: #ffffff; /* White text on hover */
+}
+
+.menu-item a.active-page {
+    background-color: var(--primary-accent);
+    font-weight: 700;
+    /* Stronger, more focused shadow */
+    box-shadow: 0 2px 10px rgba(30, 58, 138, 0.6);
+    color: #ffffff;
+}
+
+.main-content {
+    margin-left: 0;
+    padding: 40px; /* More padding */
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+}
+
+.main-content.shifted {
+    margin-left: var(--sidebar-width);
+}
+
+
+/* ------------------------------------- */
+/* 4. TICKET CARD STYLES - Accordion-style depth */
+/* ------------------------------------- */
+
+.page {
+    background-color: var(--card-bg);
+    border-radius: 18px; /* Slightly more curved */
+    /* Use subtle shadow */
+    box-shadow: var(--shadow-subtle); 
+    margin-bottom: 40px; 
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.page-header {
+    background-color: var(--primary-accent);
+    color: #fff;
+    padding: 30px 40px; /* More horizontal padding */
+    border-radius: 18px 18px 0 0;
+    font-size: 40px; 
+    font-weight: 700;
+    cursor: pointer;
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap; 
-    border: 1px solid var(--color-light-border); /* #ddd */
+    justify-content: space-between;
+    align-items: center;
+    /* Subtle gradient for depth */
+    background-image: linear-gradient(to right, var(--primary-accent), #264a9c); 
+    box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2); 
+    transition: opacity 0.2s;
+}
+
+.page-header:hover {
+    opacity: 0.95; /* Dim slightly on hover */
+    background-color: var(--primary-hover);
+}
+
+.page-subheader {
+    background-color: var(--color-secondary);
+    color: var(--text-dark);
+    padding: 25px 40px; 
+    border-radius: 0 0 18px 18px;
+    font-size: 30px; 
+    font-weight: 600;
+    border-top: 1px solid var(--border-color);
+}
+
+.page-content {
+    padding: 20px; /* More internal padding */
+    display: none;
+    background-color: var(--color-background);
+    border-top: 1px solid var(--border-color);
+}
+
+.page-content label {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--medium-gray); 
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 25px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* *** ADDED IMPROVEMENT *** */
+    border-left: 5px solid var(--color-primary); /* Bold primary color accent line */
+    padding-left: 15px; /* Padding to separate text from the line */
+}
+
+.page-content span {
+    font-size: 30px; 
+    font-weight: 500;
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 20px; 
+}
+.page-content .ticket-details {
+    margin-bottom: 40px; 
+    padding: 25px; 
+    background-color: var(--light-gray);
+    border-radius: 10px;
+    font-size: 30px; 
+    /* Inner shadow for detail box */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.page-content .select-container {
+    margin-bottom: 25px; 
+}
+
+
+/* ------------------------------------- */
+/* 5. INPUT & DROPDOWN STYLES - Polished and Elevated */
+/* ------------------------------------- */
+
+/* Dropdown/Input Styles - BASE TOUCH TARGET SIZE (70px height) */
+select, .materials-input {
+    /* Enhanced Core Styling */
+    padding: 20px 25px; 
+    font-size: 28px; 
+    height: 70px;
+    width: 100%;
+    margin-top: 0;
+    
+    /* Visual Refinements */
+    border: 1px solid var(--border-gray);
+    border-radius: 12px; /* Increased radius for softness */
+    background-color: var(--card-bg);
+    box-sizing: border-box;
+    
+    /* UX & Consistency */
+    cursor: pointer; /* Clear indication of interactivity */
+    appearance: none; /* Removed default browser styling for select */
+    -webkit-appearance: none;
+    
+    /* Deeper Inner Shadow for Recessed Look */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); 
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+/* Hover State */
+select:hover, .materials-input:hover {
+    background-color: var(--light-gray); /* Subtle background lift */
+    border-color: var(--medium-gray); /* Border slightly darkens */
+}
+
+select:focus, .materials-input:focus {
+    /* Sharper Focus Ring */
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Brighter focus glow */
+    outline: none;
+    cursor: text; /* Show text cursor when active for better UX */
+}
+
+/* Materials Input Styles - Refined for professional forms */
+.materials-input {
+    margin-top: 20px; 
+    cursor: text; /* Correct default cursor for typing */
+    
+    /* Ensure no visual properties are accidentally overridden by general input rules */
+    box-sizing: border-box; 
+    /* NEW: Subtle transition to ensure smooth entry into focused state */
+    transition: box-shadow 0.2s, border-color 0.2s; 
+    
+    /* Ensure text placeholder is readable (based on existing variables) */
+    color: var(--text-dark); 
+}
+
+/* Optional: Add specific error styling for high-end feedback */
+.materials-input.error {
+    border-color: var(--clear-red);
+    box-shadow: 0 0 0 1px var(--clear-red);
+}
+
+/* Horizontal Input Container (For FROM/TO fields) */
+.from-to-container {
+    display: flex;
+    gap: 25px; 
+    margin-top: 20px; 
+}
+
+/* Dynamic Material Row Layout */
+.dynamic-material-row {
+    display: flex; /* Ensure these are flexed for proper button alignment */
+    align-items: center;
+    gap: 20px; 
+    margin-bottom: 20px; 
+}
+
+/* Base style for material input in dynamic row */
+.dynamic-material-row .materials-input {
+    flex-grow: 1; /* Allows the material name to take up remaining space */
+    font-size: 28px; 
+    padding: 20px 25px; 
+    height: 70px; 
+}
+
+/* Number Input Style - Sharper and narrower */
+.dynamic-material-row input[type="number"] {
+    width: 120px; /* Slightly narrower to emphasize quantity */
+    max-width: 120px;
+    font-size: 28px; 
+    padding: 20px 15px; /* Reduced right padding */
+    height: 70px; 
+    text-align: right; /* Right align number for professional look */
+    /* Inherit base input styling */
+    border: 1px solid var(--border-gray);
+    border-radius: 12px;
+    box-sizing: border-box;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.dynamic-material-row input[type="number"]:focus {
+    border-color: var(--primary-accent);
+    box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+
+/* Delete Button Specific Style - Elevated, destructive look */
+.delete-material-button {
+    background-color: var(--clear-red);
+    color: white;
+    padding: 20px 25px; 
+    border: none;
+    border-radius: 12px;
+    font-size: 30px; 
+    cursor: pointer;
+    font-weight: 700; /* Bolder for impact */
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s; 
+    height: 70px; 
+    line-height: 0; 
+    flex-shrink: 0;
+    margin-top: 0 !important;
+    /* Deeper, more noticeable shadow for lift */
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.5); 
+}
+
+.delete-material-button:hover {
+    background-color: var(--clear-red-hover);
+    transform: translateY(-3px); /* Increased lift on hover */
+    box-shadow: 0 6px 12px rgba(220, 38, 38, 0.7); /* Stronger shadow on hover */
+}
+
+/* Dynamic Materials Container - Elegant wrapper */
+.dynamic-materials-container {
+    margin-top: 30px; 
+    padding: 10px; /* Slightly more padding for air */
+    border: 1px solid var(--border-gray);
+    border-radius: 15px; /* Softer radius */
+    background-color: var(--light-gray);
+    /* Subtle inner glow for a "recessed panel" look */
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05); 
+}
+
+.dynamic-materials-container p {
+    font-size: 20px; 
+    color: var(--medium-gray);
+    margin: 0 0 20px 0; /* Increased margin below */
+    font-weight: 600;
+}
+
+/* ------------------------------------- */
+/* 6. BUTTON STYLES - Deep Shadow and Lift */
+/* ------------------------------------- */
+
+/* Button Group Styles */
+.button-container {
+    gap: 25px; 
+    margin: 0px 0; 
+}
+
+/* Status Button (Primary Action) */
+.status-button {
+    padding: 25px 30px; 
+    font-size: 30px;
+    background-color: var(--action-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s, box-shadow 0.3s;
+    flex-grow: 1;
+    font-weight: 700;
+    text-transform: uppercase;
+    min-height: 75px; 
+    /* Action button shadow */
+    box-shadow: 0 4px 10px rgba(244, 130, 30, 0.4);
+}
+
+.status-button:hover:not(:disabled) {
+    background-color: var(--action-hover);
+    transform: translateY(-3px); /* Higher lift */
+    box-shadow: 0 6px 15px rgba(244, 130, 30, 0.6);
+}
+
+.status-button:disabled {
+    background-color: #c6c6c6;
+    box-shadow: none; /* No shadow when disabled */
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Add Material Button */
+.add-material-button {
+    margin-top: 25px; 
+    padding: 22px; 
+    background-color: var(--primary-accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 30px; 
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.2s ease, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3);
+}
+
+.add-material-button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 58, 138, 0.4);
+}
+
+/* Save Button (Main Form Submit) */
+.save-button {
+    background-color: var(--action-color);
+    color: #fff;
+    border: none;
+    padding: 28px 45px; 
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 32px; 
+    font-weight: 800; /* Extra bold */
+    margin-top: 50px; 
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.3s;
+    text-transform: uppercase;
+    width: 100%;
+    min-height: 80px; 
+    /* Prominent shadow */
+    box-shadow: 0 6px 15px rgba(244, 130, 30, 0.4);
+}
+
+.save-button:hover:not(:disabled) {
+    background-color: var(--action-hover);
+    transform: translateY(-4px); /* Max lift */
+    box-shadow: 0 8px 20px rgba(244, 130, 30, 0.7);
+}
+
+
+/* ------------------------------------- */
+/* 7. SIGNATURE & UPLOAD STYLES - Clean & Structured */
+/* ------------------------------------- */
+
+.signature-group {
+    margin-top: 30px; 
+    padding: 20px; 
+    border: 2px solid var(--border-gray); /* Softer border */
+    border-radius: 18px; 
+    background-color: var(--light-gray);
+    box-shadow: var(--shadow-subtle);
+}
+
+.signature-group h2 {
+    font-size: 34px; 
+    margin-bottom: 25px; 
+    text-align: center;
+    color: var(--text-dark);
+}
+
+.signature-group canvas {
+    border: 1px solid var(--border-gray);
+    background-color: var(--card-bg);
+    width: 100%;
+    height: 400px; /* Taller */
+    touch-action: none;
+    border-radius: 10px;
+    display: block;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Clear Signature Button */
+.signature-group .status-button {
+    background-color: var(--clear-red);
+    margin-top: 20px; 
+    width: 100%;
+    padding: 22px; 
+    font-size: 30px; 
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4);
+}
+
+/* Upload Form Styles */
+.upload-form {
+    margin-top: 50px; 
+    padding-top: 40px; 
+    border-top: 2px solid var(--border-color); /* Solid separator */
+}
+
+.upload-form h1 {
+    font-size: 40px; 
+    text-align: center;
+    margin-bottom: 40px; 
+}
+
+.upload-form h2 {
+    font-size: 30px; 
+    margin-top: 30px; 
+    color: var(--primary-accent);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 12px; 
+}
+
+.file-group {
+    margin-bottom: 25px; 
+    padding: 30px; 
+    border: 1px solid var(--border-gray);
+    border-radius: 12px;
+    background-color: var(--card-bg);
+    box-shadow: var(--shadow-subtle);
+}
+
+.file-group label {
+    font-size: 26px; 
+    font-weight: 700;
+    margin-bottom: 15px; 
+    color: var(--text-dark);
+}
+
+.file-group input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 20px 0; 
+    font-size: 26px; 
+}
+
+.file-group-nested {
+    margin-top: 20px; 
+    padding: 25px; 
+    /* Thicker, more pronounced accent border */
+    border-left: 4px solid var(--primary-accent);
+    background-color: var(--light-gray);
+    border-radius: 6px;
+}
+
+
+/* ------------------------------------- */
+/* 8. TABLE STYLES (for Stocks/Consumption) - Elevated Data Presentation */
+/* ------------------------------------- */
+
+.data-table-container {
+    margin: 50px auto; 
+    overflow-x: auto; 
+    border-radius: 18px;
+    box-shadow: var(--shadow-medium); 
+    border: 1px solid var(--border-color);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: separate; /* Use separate for rounded corners on the table header */
+    border-spacing: 0;
+    background-color: var(--card-bg);
+    min-width: 900px; 
+    table-layout: fixed; 
+}
+
+.data-table th, .data-table td {
+    padding: 25px; /* More padding */
+    border-bottom: 1px solid var(--border-color); 
+    font-size: 26px; /* Larger font */
+}
+
+.data-table th { 
+    background-color: var(--primary-accent); 
+    color: white; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    position: sticky; 
+    top: 0; 
+    text-align: left; 
+    /* Added subtle gradient for depth */
+    background-image: linear-gradient(to right, var(--primary-accent), #264a9c); 
+}
+
+/* Rounded corners for the header */
+.data-table th:first-child { border-top-left-radius: 18px; }
+.data-table th:last-child { border-top-right-radius: 18px; }
+
+
+.data-table tr:nth-child(even) {
+    background-color: var(--light-gray);
+}
+
+.data-table tr:hover {
+    background-color: #e5e7eb; /* Better hover color */
+    transition: background-color 0.2s;
+}
+
+/* Action Buttons within tables */
+.stock-action-button {
+    padding: 18px 25px; 
+    font-size: 24px; 
+    border-radius: 10px;
+    margin-right: 10px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Status Indicators --- */
+.status-badge {
+    padding: 12px 18px; 
+    border-radius: 30px; /* More rounded */
+    font-weight: 700;
+    font-size: 24px; 
+    letter-spacing: 0.5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); /* Subtle lift */
+}
+
+.status-badge.Complete {
+    /* Use primary accent for a professional "done" color */
+    background-color: var(--primary-accent); 
+    color: white;
+}
+
+
+/* ------------------------------------- */
+/* 9. MULTISELECT STYLES - Clean Pop-up */
+/* ------------------------------------- */
+
+.multiselect-display {
+    padding: 22px 30px; 
+    border: 1px solid var(--border-gray);
+    border-radius: 10px;
+    font-size: 30px; 
+    box-shadow: var(--shadow-subtle);
+}
+
+.multiselect-options {
+    z-index: 100;
+    max-height: 450px;
+    /* --- FIX 1: ADD SCROLL TO CONTAINER --- */
+    /* This ensures the entire popup adheres to the max-height and scrolls */
+    overflow-y: auto; 
+    /* This makes the search bar stack above the columns wrapper */
+    display: flex; 
+    flex-direction: column;
+
+    border: 1px solid var(--border-gray);
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+    gap: 30px; 
+    min-width: 600px;
+}
+
+/* --- NEW WRAPPER STYLES FOR SCROLL AND LAYOUT --- */
+.multiselect-columns-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 30px;
+    padding: 0 15px 15px 15px; /* Adjust padding to sit nicely inside the main div */
+    width: 100%;
+    /* Note: We removed overflow-y from here and moved it to multiselect-options */
+}
+
+.multiselect-column {
+    /* FIX 2: Ensure columns can grow but stop at 50% */
+    flex: 1 1 50%;
+    min-width: 0; 
+}
+
+.category-title {
+    font-weight: 800; 
+    color: var(--primary-accent);
+    font-size: 34px; 
+    border-bottom: 3px solid var(--border-gray); 
+    margin-bottom: 20px; 
+    padding-top: 8px;
+}
+
+/* Ensure checkbox and text align nicely */
+.multiselect-options label {
+    display: flex; /* Use flex on the label itself */
+    align-items: center;
+    gap: 15px; /* Space between checkbox and text */
+    padding: 12px 10px; 
+    font-size: 30px; 
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.multiselect-options label:hover {
+    background-color: var(--light-gray); 
+    border-radius: 5px; 
+}
+
+.multiselect-options input[type="checkbox"] {
+    width: 30px; 
+    height: 30px;
+    margin: 0;
+    flex-shrink: 0;
+    border: 2px solid var(--border-gray);
+    border-radius: 6px;
+    accent-color: var(--primary-accent); 
+}
+
+.multiselect-search {
+    padding: 18px 25px; 
+    margin: 10px 15px 20px 15px;
+    border: 1px solid var(--border-gray);
+    border-radius: 10px; 
+    font-size: 30px; 
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+    /* Make search full width of container */
+    width: auto; 
+}
+
+/* ------------------------------------- */
+/* 💥 10. COMPACT MODE (20% SMALLER & ZERO WASTE) */
+/* ------------------------------------- */
+@media (max-width: 768px) {
+    body {
+        font-size: 12px !important; 
+        overflow-x: hidden;
+    }
+    
+    * {
+        box-sizing: border-box !important;
+    }
+
+    .container, .main-content {
+        width: 100% !important;
+        padding: 5px !important; 
+        margin: 0 !important;
+    }
+
+    /* --- FIXED MENU TOGGLE: TOP RIGHT FOR MOBILE --- */
+    .menu-toggle { 
+        top: 10px !important; 
+        right: 10px !important; 
+        left: auto !important;  
+        padding: 10px 15px !important; 
+        font-size: 20px !important; 
+        border-radius: 8px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        position: fixed !important; 
+        z-index: 1001;
+    }
+
+    /* LOGO & TITLES */
+    .logo-container { margin-bottom: 15px !important; }
+    .logo-container img {
+        max-width: 140px !important; 
+    }
+    h1 { font-size: 18px !important; margin: 5px 0 !important; }
+    h2 { font-size: 14px !important; margin: 0 !important; }
+
+    /* INPUTS & BUTTONS - Slim & Sleek */
+    select, 
+    .materials-input,
+    .search-input,
+    .status-button,
+    .save-button,
+    .add-material-button,
+    .signature-group .status-button {
+        height: 38px !important; 
+        padding: 4px 8px !important; 
+        font-size: 13px !important; 
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+        border-radius: 4px !important;
+    }
+
+    /* SEARCH BAR */
+    .search-container {
+        display: flex;
+        flex-direction: row !important;
+        gap: 4px;
+        margin-bottom: 15px !important;
+    }
+    .search-input { flex: 3; }
+    .search-button { flex: 1; min-height: 38px !important; font-size: 13px !important; }
+
+    /* TICKET HEADERS */
+    .page-header {
+        font-size: 14px !important;
+        padding: 8px 12px !important;
+    }
+    
+    .page-subheader {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+    }
+
+    /* LABELS & SPANS */
+    .page-content label {
+        font-size: 11px !important;
+        margin-top: 6px !important;
+        padding-left: 6px !important;
+        border-left: 3px solid var(--color-primary) !important;
+    }
+    .page-content span, 
+    .page-content .ticket-details {
+        font-size: 13px !important;
+        margin-bottom: 6px !important;
+        padding: 8px !important;
+    }
+
+    /* THE "FROM-TO" ROW */
+    .from-to-container, .dynamic-material-row {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 4px !important;
+    }
+    .delete-material-button {
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 14px !important;
+    }
+
+    /* --- SQUEEZED TABLE FIX (NO SWIPE) --- */
+    .data-table-container {
+        margin: 10px 0 !important;
+        width: 100% !important;
+        overflow-x: hidden !important; /* Kill the swipe */
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    .data-table {
+        min-width: 100% !important; /* Force it to be exactly screen width */
+        width: 100% !important;
+        table-layout: fixed !important; /* Force columns to share space */
+    }
+
+    .data-table th, .data-table td {
+        padding: 4px 2px !important; /* Minimal padding to save space */
+        font-size: 10px !important; /* Very small text to fit */
+        word-wrap: break-word !important; /* Wrap long words */
+        overflow-wrap: break-word !important;
+        white-space: normal !important; /* Allow text to wrap to next line */
+        text-align: center !important;
+    }
+
+    /* SIGNATURE & UPLOADS */
+    .signature-group { padding: 10px !important; margin-top: 15px !important; }
+    .signature-group canvas { height: 150px !important; }
+    .upload-form { margin-top: 20px !important; padding-top: 15px !important; }
+    .file-group { padding: 10px !important; margin-bottom: 10px !important; }
+
+    .file-group input[type="file"] {
+        padding: 8px 0 !important;
+        font-size: 13px !important;
+    }
+    
+    /* SIDEBAR */
+    .sidebar.open { width: 75% !important; }
+    .sidebar-header { font-size: 18px !important; padding: 15px !important; }
+    .menu-item a { font-size: 15px !important; padding: 12px 20px !important; }
+
+    /* MULTISELECT MOBILE ADJUSTMENT */
+    .multiselect-options {
+        z-index: 100;
+        max-height: 400px !important;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 10px !important;
+        gap: 8px !important; 
+        min-width: 100% !important; 
+        width: 100% !important;
+    }
+
+    .multiselect-search {
+        padding: 10px 12px !important; 
+        margin: 5px 10px 10px 10px !important; 
+        font-size: 14px !important; 
+        border-radius: 6px !important;
+        width: calc(100% - 20px) !important;
+    }
+
+    .category-title {
+        font-weight: 800;
+        font-size: 18px !important; 
+        border-bottom: 2px solid var(--border-gray) !important; 
+        margin-bottom: 8px !important;
+        padding-top: 5px !important;
+    }
+
+    /* SEARCH BUTTON FIX */
+    .search-button {
+        white-space: nowrap;
+        padding: 0 10px !important;
+    }
+
+    .materials-container {
+        padding: 12px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .materials-container h2 {
+        font-size: 20px !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* TABLE ACTIONS */
+    .table-actions {
+        text-align: center !important;
+        margin-bottom: 15px !important;
+    }
+
+    .table-actions button {
+        width: 100% !important;
+        height: 44px !important;
+        font-size: 16px !important;
+    }
+}
+
+/* Nested Items Table Styling */
+.inner-table-wrapper {
+    background: #ffffff;
     border-radius: 8px;
     padding: 10px;
+    border: 1px solid #e0e0e0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.ageing-list li {
-    padding: 5px 10px;
-    font-size: 18px;
-    font-weight: 500;
+.inner-items-table th {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #555;
 }
 
-.ageing-list li span {
-    font-weight: bold;
-    color: var(--color-dashboard-title); /* #1f3f66 */
-    margin-left: 5px;
+.inner-items-table tr:last-child {
+    border-bottom: none !important;
 }
 
-/* ------------------------------------------- */
-/* AGENT LEADS MONITORING VIEW STYLES (Final View) */
-/* ------------------------------------------- */
-#agentLeadsMonitoringView {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    padding: 20px;
-    background-color: var(--color-primary-light); /* #F8F8F8 */
-    box-sizing: border-box;
+/* Mobile tweak for the inner table */
+@media (max-width: 768px) {
+    .inner-items-table {
+        font-size: 11px !important;
+    }
+    .inner-table-wrapper h4 {
+        font-size: 14px !important;
+    }
 }
-.leads-header {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 20px;
+
+/* --- MATERIAL REQUEST REDESIGN --- */
+.request-form-container {
+    max-width: 600px;
+    margin: auto;
 }
-.leads-header h3 {
-    background: var(--color-leads-header); /* #2196F3 */
-    color: var(--color-text-light); /* white */
-    padding: 12px 20px;
-    margin: 0;
-    border-radius: 6px;
-    font-size: 24px;
-    width: 100%;
-    box-sizing: border-box;
-}
-#leadsSearchInput {
-    flex-grow: 1;
-    width: 100%;
-    padding: 12px 15px;
-    font-size: 16px;
-    border: 1px solid var(--color-border-default); /* #ccc */
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-#leadsFilterBtn {
-    padding: 12px 25px;
-    background-color: var(--color-filter-blue); /* #4b8ae0 */
-    color: var(--color-text-light); /* white */
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-#leadsFilterBtn:hover { background-color: var(--color-filter-blue-hover); } /* #3974c0 */
-#leadsWrapper {
-    overflow-y: auto;
-    flex-grow: 1;
-    max-height: calc(100vh - 150px);
-    box-shadow: var(--shadow-table); /* 0 2px 10px rgba(0, 0, 0, 0.1) */
-    border-radius: 8px;
-    overflow-x: auto;
-}
-#leadsTable {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--color-menu-bg); /* #fff */
-}
-#leadsTable thead th {
-    position: sticky;
-    background-color: var(--color-primary-dark); /* #1A232F */
-    color: var(--color-text-light); /* white */
-    z-index: 2;
-    top: 0;
-}
-#leadsTable th, #leadsTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--color-light-border); /* #ddd */
+
+.section-label {
+    display: block;
+    margin-top: 25px;
+    font-weight: 800;
     font-size: 14px;
-    white-space: nowrap;
-}
-#leadsTable tbody tr:hover {
-    background-color: var(--color-hover-light); /* #DDDDDD */
-    transition: background-color 0.2s ease;
-}
-@media (min-width: 640px) {
-    .leads-header { flex-direction: row; }
-    #leadsSearchInput { width: auto; }
-    .leads-header h3 { width: auto; }
+    color: var(--primary-accent);
+    border-left: 4px solid var(--primary-accent);
+    padding-left: 10px;
+    margin-bottom: 15px;
 }
 
-/* Custom class for the image preview container to layer it correctly (Swal) */
-.swal2-top-container {
-    z-index: 20000 !important; 
-    background-color: transparent !important; 
-}
-/* Optional: Make the image preview modal itself slightly smaller or customized */
-.swal2-image-modal {
-    max-width: 80vw;
+.request-card {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    transition: all 0.2s ease;
 }
 
+.request-card:focus-within {
+    border-color: var(--primary-accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
 
-//aftersales
-.checkbox-dropdown {
-    position: relative;
+.request-card-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.remark-input {
+    background-color: #f8f9fa !important;
+    border: 1px dashed #ccc !important;
+    font-size: 12px !important;
+    height: 34px !important;
+}
+
+.add-item-btn {
     width: 100%;
-}
-.checkbox-dropdown .items {
-    display: none;
-    position: absolute;
-    background: #fff;
-    border: 1px solid #ccc;
-    width: 100%;
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-.checkbox-dropdown .items label {
-    display: block;
-    padding: 8px 12px;
+    padding: 12px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
-}
-.checkbox-dropdown .items label:hover {
-    background: #f0f0f0;
+    margin-top: 5px;
 }
 
-/* Add this to your CSS section to fix the layout */
-    .as-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* This creates exactly 2 columns */
-        gap: 20px;
-        margin-top: 15px;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        font-size: 13px;
-        color: #333;
-    }
-
-    .form-group input, .form-group select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box; /* Crucial for keeping inputs inside the grid */
-    }
-
-    .requirement-item {
-        background: #fdf2e9;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 5px solid #e67e22;
-        margin-bottom: 10px;
-    }
-    .requirement-item label { color: #d35400; font-weight: bold; }
-    .file-input { margin-top: 5px; font-size: 12px; }
-
-    //aftersales
-    .status-pill {
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .status-pill.pending { background: #fff3cd; color: #856404; }
-    .status-pill.completed { background: #d4edda; color: #155724; }
-
-    .btn-view {
-      background: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      cursor: pointer;
-      margin-right: 5px;
-    }
-    .btn-delete {
-      background: #f44336;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      cursor: pointer;
-    }
-
-    .aftersales-swal-modal span {
-    color: #333;
-    display: block;
-    margin-bottom: 5px;
+.remove-row-btn {
+    background: #ffeded;
+    color: #dc3545;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@media (max-width: 480px) {
-    .aftersales-swal-modal div {
-        grid-template-columns: 1fr !important; /* Stack columns on small phones */
+.submit-request-button {
+    background: var(--primary-accent);
+    color: white;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* Mobile Tweaks */
+@media (max-width: 768px) {
+    .request-card { padding: 10px; }
+    .item-select { font-size: 11px !important; }
+    .qty-input { width: 60px !important; font-size: 11px !important; }
+}
+
+/* --- ADD THIS TO YOUR @media (max-width: 768px) SECTION in CSS.HTML --- */
+
+/* 1. Global Safety - Keep this outside the media query */
+.detail-row {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* --- YOUR EXISTING CSS (KEEPING EVERYTHING) --- */
+    .request-card {
+        padding: 8px !important;
+        margin-bottom: 10px !important;
+        background: #ffffff !important;
+        border: 1px solid #ddd !important;
+    }
+
+    .request-card-row {
+        display: flex !important;
+        gap: 5px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .item-select {
+        flex: 3 !important;
+        min-width: 0 !important;
+    }
+
+    .quantity-input {
+        width: 65px !important;
+        flex: none !important;
+    }
+
+    .remove-row-btn {
+        width: 38px !important;
+        flex: none !important;
+    }
+
+    .remark-input {
+        width: 100% !important;
+        margin-top: 8px !important;
+        font-size: 12px !important;
+        display: block !important;
+    }
+
+    .submit-request-button {
+        padding: 12px !important;
+        font-size: 16px !important;
+    }
+    
+    .section-label {
+        font-size: 12px !important;
+        margin-top: 15px !important;
+    }
+
+    .detail-row td {
+        padding: 0 !important; 
+    }
+
+    .nested-table {
+        width: 100% !important;
+        margin: 0 !important;
+        border-left: 4px solid var(--color-primary) !important;
+        border-collapse: collapse !important;
+    }
+
+    .nested-table th {
+        background: #f1f1f1 !important;
+        font-size: 9px !important;
+        padding: 5px 2px !important;
+        text-transform: uppercase;
+    }
+
+    .nested-table td {
+        font-size: 10px !important;
+        padding: 8px 4px !important;
+        border-bottom: 1px solid #eee !important;
+        text-align: left !important;
+    }
+
+    /* Animation */
+    .detail-row[style*="table-row"] {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* --- ADDING NEW MONITORING STYLES BELOW (MOBILE OPTIMIZED) --- */
+    
+    .refresh-button {
+        padding: 8px 15px !important;
+        font-size: 14px !important;
+        margin-left: 5px !important;
+    }
+
+    .status-badge {
+        padding: 4px 8px !important;
+        border-radius: 12px !important;
+        font-size: 8px !important; /* Smaller for mobile tables */
+        font-weight: bold !important;
+        display: inline-block !important;
+        text-align: center !important;
+        min-width: 90px !important;
+    }
+
+    .status-activated {
+        background-color: #d4edda !important;
+        color: #155724 !important;
+        border: 1px solid #c3e6cb !important;
+    }
+
+    .status-for-activation {
+        background-color: #fff3cd !important;
+        color: #856404 !important;
+        border: 1px solid #ffeeba !important;
     }
 }
-</style>
 
+/* Outside media query for desktop defaults */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+}
+.status-activated { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.status-for-activation { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+
+  </style>
 </head>
 <body>
+
+  <div id="auth-fallback">
+    <img src="https://i.ibb.co/ZqC6Lpf/Galaxy-Fiber-Logo-350x100pixels.png" width="200" alt="Logo">
+    <h3>Access Restricted by Google</h3>
+    <p>Mobile browsers often block Google Apps Script inside other sites.</p>
+    <a href="https://script.google.com/macros/s/AKfycbxN3kgi1RBIqK9xD9kW3pWX8bLXY1Kna4hZeaaqbu_VUjo9wvMPEYAPC3QfULLfapYn/exec" 
+       target="_blank" 
+       class="login-button">
+       OPEN APP IN NEW TAB
+    </a>
+    <p style="font-size: 12px; color: #666; margin-top: 15px;">After logging in, you can return here and refresh.</p>
+  </div>
+
   <iframe 
+    id="appIframe"
     src="https://script.google.com/macros/s/AKfycbxN3kgi1RBIqK9xD9kW3pWX8bLXY1Kna4hZeaaqbu_VUjo9wvMPEYAPC3QfULLfapYn/exec"
-    width="100%"
-    height="100%"
-    allowfullscreen="true"
-    /* ADD THIS LINE BELOW */
     allow="geolocation"
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+    allowfullscreen="true">
   </iframe>
 
   <script>
+    // 1. Fullscreen Logic
     window.onload = function() {
-      // Note: Fullscreen usually requires a user click to work; 
-      // browsers often block automatic fullscreen on page load.
-      document.querySelector('iframe')
-        .requestFullscreen()
-        .catch((err) => {
-          console.error('Error attempting to enable full-screen mode:', err.message);
-        });
+      const iframe = document.getElementById('appIframe');
+      
+      // Attempt fullscreen (Note: Mobile browsers often require a click first)
+      iframe.requestFullscreen().catch((err) => {
+        console.log("Auto-fullscreen blocked. This is normal for mobile security.");
+      });
+
+      // 2. 403 Error Detection
+      // If we don't receive a message from the app, or after 6 seconds, 
+      // we show the manual login button for users who are blocked.
+      setTimeout(function() {
+        // We check if the iframe is actually displaying content
+        // If it's blocked by a 403, we can't read its content, but we can guess it failed
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          if (!iframeDoc || iframeDoc.body.innerHTML.length === 0) {
+            showFallback();
+          }
+        } catch (e) {
+          // If we hit a CORS error here, it means the iframe loaded something 
+          // from Google, which is actually a GOOD sign. 
+          console.log("App loaded or blocked by Google Auth Policy.");
+        }
+      }, 6000);
     };
+
+    function showFallback() {
+      document.getElementById('auth-fallback').style.display = 'flex';
+      document.getElementById('appIframe').style.display = 'none';
+    }
   </script>
 </body>
 </html>
