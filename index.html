@@ -1,42 +1,16 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <link rel="icon" type="image/png" href="https://i.ibb.co/ZqC6Lpf/Galaxy-Fiber-Logo-350x100pixels.png">
-  <title>FIELD ENGINEER JO WEBAPP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #f4f4f4; font-family: sans-serif; }
-    
-    /* Login Helper Styling */
-    #auth-fallback {
-      display: none; /* Hidden by default */
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-      padding: 20px;
-    }
-    .login-button {
-      background-color: #4285F4;
-      color: white;
-      padding: 15px 25px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      margin-top: 20px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    iframe {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
 
-    /* ------------------------------------- */
+<html>
+
+<head>
+
+  <link rel="icon" type="image/png" href="https://i.ibb.co/ZqC6Lpf/Galaxy-Fiber-Logo-350x100pixels.png">
+
+  <title>FIELD ENGINEER JO WEBAPP</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ------------------------------------- */
 /* 0. CORE COLOR & FONT VARIABLES - REFINED FOR EXPENSIVE LOOK */
 /* ------------------------------------- */
 :root {
@@ -1356,62 +1330,54 @@ select:focus, .materials-input:focus {
 .status-for-activation { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
 
 
-  </style>
+
+</style>
 </head>
+
 <body>
 
-  <div id="auth-fallback">
-    <img src="https://i.ibb.co/ZqC6Lpf/Galaxy-Fiber-Logo-350x100pixels.png" width="200" alt="Logo">
-    <h3>Access Restricted by Google</h3>
-    <p>Mobile browsers often block Google Apps Script inside other sites.</p>
-    <a href="https://script.google.com/macros/s/AKfycbxN3kgi1RBIqK9xD9kW3pWX8bLXY1Kna4hZeaaqbu_VUjo9wvMPEYAPC3QfULLfapYn/exec" 
-       target="_blank" 
-       class="login-button">
-       OPEN APP IN NEW TAB
-    </a>
-    <p style="font-size: 12px; color: #666; margin-top: 15px;">After logging in, you can return here and refresh.</p>
-  </div>
-
   <iframe 
-    id="appIframe"
+
     src="https://script.google.com/macros/s/AKfycbxN3kgi1RBIqK9xD9kW3pWX8bLXY1Kna4hZeaaqbu_VUjo9wvMPEYAPC3QfULLfapYn/exec"
+
+    width="100%"
+
+    height="100%"
+
+    allowfullscreen="true"
+
+    /* ADD THIS LINE BELOW */
+
     allow="geolocation"
-    allowfullscreen="true">
+
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none;">
+
   </iframe>
 
-  <script>
-    // 1. Fullscreen Logic
-    window.onload = function() {
-      const iframe = document.getElementById('appIframe');
-      
-      // Attempt fullscreen (Note: Mobile browsers often require a click first)
-      iframe.requestFullscreen().catch((err) => {
-        console.log("Auto-fullscreen blocked. This is normal for mobile security.");
-      });
 
-      // 2. 403 Error Detection
-      // If we don't receive a message from the app, or after 6 seconds, 
-      // we show the manual login button for users who are blocked.
-      setTimeout(function() {
-        // We check if the iframe is actually displaying content
-        // If it's blocked by a 403, we can't read its content, but we can guess it failed
-        try {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          if (!iframeDoc || iframeDoc.body.innerHTML.length === 0) {
-            showFallback();
-          }
-        } catch (e) {
-          // If we hit a CORS error here, it means the iframe loaded something 
-          // from Google, which is actually a GOOD sign. 
-          console.log("App loaded or blocked by Google Auth Policy.");
-        }
-      }, 6000);
+
+  <script>
+
+    window.onload = function() {
+
+      // Note: Fullscreen usually requires a user click to work; 
+
+      // browsers often block automatic fullscreen on page load.
+
+      document.querySelector('iframe')
+
+        .requestFullscreen()
+
+        .catch((err) => {
+
+          console.error('Error attempting to enable full-screen mode:', err.message);
+
+        });
+
     };
 
-    function showFallback() {
-      document.getElementById('auth-fallback').style.display = 'flex';
-      document.getElementById('appIframe').style.display = 'none';
-    }
   </script>
+
 </body>
+
 </html>
